@@ -1,44 +1,52 @@
+
 from app.schemas import StartupIdea
 
 
 def generate_search_queries(idea: StartupIdea):
 
-    # Get the target market
-    market = idea.target_market or "global"
+    # Convert the extracted keywords into a searchable string.
+    # This allows Tavily to search using multiple relevant terms.
+    keyword_text = ", ".join(idea.keywords) if idea.keywords else idea.industry
 
-    # Generate different queries for different research categories
+    # Generate a separate query for each market research category.
     queries = {
 
-        # Find companies offering similar solutions
+        # Find existing companies that offer similar solutions.
         "competitors": (
-            f"{idea.solution} competitors "
-            f"and competing companies in {market}"
+            f"Companies and startups offering solutions similar to "
+            f"{idea.solution} in the {idea.industry} industry. "
+            f"Include {keyword_text}."
         ),
 
-        # Find existing products that solve the same problem
+        # Find existing products that solve the same problem.
         "similar_products": (
-            f"Existing products and alternatives for "
-            f"{idea.problem} in {market}"
+            f"Existing products, platforms and alternatives that address "
+            f"{idea.problem}. "
+            f"Related solution: {idea.solution}."
         ),
 
-        # Understand the industry's current trends
+        # Understand current trends and developments in the industry.
         "market_trends": (
-            f"{idea.industry} market trends "
-            f"growth reports {market}"
+            f"Latest market trends, growth, innovations and developments "
+            f"in the {idea.industry} industry. "
+            f"Related keywords: {keyword_text}."
         ),
 
-        # Understand the problems and needs of potential customers
+        # Identify the needs and challenges of potential customers.
         "customer_demand": (
-            f"{idea.target_audience} problems and needs "
-            f"related to {idea.problem} in {market}"
+            f"Problems, challenges and unmet needs of "
+            f"{idea.target_audience} related to {idea.problem}. "
+            f"Look for evidence of customer demand."
         ),
 
-        # Identify possible gaps in the existing market
+        # Identify opportunities that existing products may not address.
         "market_gaps": (
-            f"Unmet needs and opportunities in "
-            f"{idea.industry} in {market}"
+            f"Unmet customer needs and market opportunities in the "
+            f"{idea.industry} industry. "
+            f"Focus on the problem: {idea.problem}. "
+            f"Consider the proposed solution: {idea.solution}."
         )
     }
 
-    # Return all generated queries
+    # Return all five generated search queries.
     return queries

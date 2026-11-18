@@ -1,42 +1,49 @@
-from typing import Optional
+
+from typing import List
 from pydantic import BaseModel, Field
 
 
-# Defines the structure of the startup idea
+# Defines the structure of the startup idea received from Task 3.
+# These field names must match IdeaExtractResponse in idea_schema.py.
+
 class StartupIdea(BaseModel):
 
-    # Name of the startup idea
-    idea_name: str = Field(
+    # Extracted or refined name of the startup
+    startup_name: str = Field(
         ...,
         min_length=2
     )
 
-    # Problem the startup aims to solve
+    # Core problem the startup aims to solve
     problem: str = Field(
         ...,
         min_length=5
     )
 
-    # Proposed solution
+    # Proposed product or service solution
     solution: str = Field(
         ...,
         min_length=5
     )
 
-    # People who will use the product
+    # People who will use or benefit from the product
     target_audience: str = Field(
         ...,
         min_length=2
     )
 
-    # Industry to which the startup belongs
+    # Industry or sector in which the startup operates
     industry: str = Field(
         ...,
         min_length=2
     )
 
-    # Country or region where the startup will operate
-    # Optional because the extracted idea may not always contain it
-    target_market: Optional[str] = Field(
-        default="global"
+    # How the startup plans to generate revenue
+    business_model: str = Field(
+        ...
+    )
+
+    # Relevant domain and technology keywords extracted by the LLM
+    keywords: List[str] = Field(
+        default_factory=list
     )
