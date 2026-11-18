@@ -2,51 +2,84 @@
 from app.schemas import StartupIdea
 
 
+def clean_phrase(text: str) -> str:
+    """
+    Clean extracted text before inserting it into a search query.
+    Removes unnecessary spaces and trailing punctuation.
+    """
+    text = text.strip()
+
+    # Remove trailing punctuation
+    text = text.rstrip(".,;:")
+
+    # Remove unnecessary starting articles
+    for article in ["A ", "An ", "The "]:
+        if text.lower().startswith(article.lower()):
+            text = text[len(article):]
+            break
+
+    return text.strip()
+
+
 def generate_search_queries(idea: StartupIdea):
 
-    # Convert the extracted keywords into a searchable string.
-    # This allows Tavily to search using multiple relevant terms.
-    keyword_text = ", ".join(idea.keywords) if idea.keywords else idea.industry
+    # Clean extracted startup details
+    solution = clean_phrase(idea.solution)
+    problem = clean_phrase(idea.problem)
+    industry = clean_phrase(idea.industry)
+    audience = clean_phrase(idea.target_audience)
 
-    # Generate a separate query for each market research category.
+    # Use keywords if available, otherwise use the industry
+    keyword_text = (
+        ", ".join(idea.keywords)
+        if idea.keywords
+        else industry
+    )
+
     queries = {
 
-        # Find existing companies that offer similar solutions.
+        # 1. Competitor research:
+        # Find companies and startups offering similar solutions.
         "competitors": (
-            f"Companies and startups offering solutions similar to "
-            f"{idea.solution} in the {idea.industry} industry. "
-            f"Include {keyword_text}."
-        ),
-
-        # Find existing products that solve the same problem.
-        "similar_products": (
-            f"Existing products, platforms and alternatives that address "
-            f"{idea.problem}. "
-            f"Related solution: {idea.solution}."
-        ),
-
-        # Understand current trends and developments in the industry.
-        "market_trends": (
-            f"Latest market trends, growth, innovations and developments "
-            f"in the {idea.industry} industry. "
+            f"Startups and companies in the {industry} industry "
+            f"addressing the challenge: {problem}. "
+            f"Focus on solutions similar to {solution}. "
             f"Related keywords: {keyword_text}."
         ),
 
-        # Identify the needs and challenges of potential customers.
-        "customer_demand": (
-            f"Problems, challenges and unmet needs of "
-            f"{idea.target_audience} related to {idea.problem}. "
-            f"Look for evidence of customer demand."
+        # 2. Similar product research:
+        # Find actual products, platforms and alternatives.
+        "similar_products": (
+            f"Existing products, applications and platforms "
+            f"addressing the challenge: {problem}. "
+            f"Find alternatives and products with features similar "
+            f"to {solution}."
         ),
 
-        # Identify opportunities that existing products may not address.
+        # 3. Market trends:
+        # Understand industry growth and emerging developments.
+        "market_trends": (
+            f"Recent market trends, industry growth, innovations "
+            f"and technological developments in {industry}. "
+            f"Focus on {keyword_text}."
+        ),
+
+        # 4. Customer demand:
+        # Find evidence of customer needs and demand.
+        "customer_demand": (
+            f"Customer needs, challenges and unmet demands of "
+            f"{audience} related to {problem}. "
+            f"Look for surveys, reports, studies and market research."
+        ),
+
+        # 5. Market gaps:
+        # Identify problems existing solutions have not addressed.
         "market_gaps": (
-            f"Unmet customer needs and market opportunities in the "
-            f"{idea.industry} industry. "
-            f"Focus on the problem: {idea.problem}. "
-            f"Consider the proposed solution: {idea.solution}."
+            f"Unmet needs and underserved areas in the {industry} "
+            f"industry related to {problem}. "
+            f"Identify limitations in existing solutions and "
+            f"opportunities for improvement."
         )
     }
 
-    # Return all five generated search queries.
     return queries
