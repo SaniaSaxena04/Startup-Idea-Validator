@@ -1,9 +1,14 @@
 # Environment variables and API keys
 .env
+.env.*
+!.env.example
 
 # Python virtual environments
 venv/
 .venv/
+
+# Node.js dependencies
+node_modules/
 
 # Python cache files
 __pycache__/
