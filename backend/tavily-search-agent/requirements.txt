@@ -1,5 +1,0 @@
-﻿fastapi
-uvicorn[standard]
-tavily-python
-python-dotenv
-pydantic

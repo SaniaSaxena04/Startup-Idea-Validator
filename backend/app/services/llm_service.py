@@ -1,3 +1,5 @@
+#llm_service.py	
+# Calls Gemini to extract/structure the startup idea
 import json
 import os
 from dotenv import load_dotenv
