@@ -16,7 +16,7 @@ from app.services.llm_service import (
     gemini_extractor,
 )
 
-from app.services.market_research import (
+from app.agents.market_research_agent import (
     run_market_research,
 )
 

@@ -182,3 +182,21 @@ def run_market_research(idea: IdeaExtractResponse):
     }
 
     return output
+
+#Gemini extraction → Extract the startup idea into structured fields.
+
+
+#Gemini query generation → Generate five dynamic queries for:
+#- Competitors
+#- Similar products
+#- Market trends
+#- Customer demand
+#- Market gaps
+
+
+
+#Tavily search → Search the web using those queries.
+
+
+
+#Response → Return search results with titles, URLs, content and scores
