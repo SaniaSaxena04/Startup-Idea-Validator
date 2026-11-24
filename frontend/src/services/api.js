@@ -7,27 +7,29 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000,
+  timeout: 60000,
 });
+
+const formatApiError = (error) => {
+  if (error.response) {
+    const detail = error.response.data?.detail;
+    if (Array.isArray(detail)) {
+      const formatted = detail.map((err) => `${err.loc.slice(-1)[0]}: ${err.msg}`).join(', ');
+      return new Error(formatted);
+    }
+    return new Error(detail || `Server responded with status ${error.response.status}`);
+  } else if (error.request) {
+    return new Error('Unable to reach the backend server. Ensure FastAPI is running on ' + API_BASE_URL);
+  }
+  return new Error(error.message || 'An unexpected error occurred.');
+};
 
 export const extractStartupIdea = async (ideaPayload) => {
   try {
     const response = await apiClient.post('/api/ideas/extract', ideaPayload);
     return response.data;
   } catch (error) {
-    if (error.response) {
-      const detail = error.response.data?.detail;
-      if (Array.isArray(detail)) {
-        // Pydantic validation error array
-        const formatted = detail.map((err) => `${err.loc.slice(-1)[0]}: ${err.msg}`).join(', ');
-        throw new Error(formatted);
-      }
-      throw new Error(detail || `Server responded with status ${error.response.status}`);
-    } else if (error.request) {
-      throw new Error('Unable to reach the backend server. Ensure FastAPI is running on ' + API_BASE_URL);
-    } else {
-      throw new Error(error.message || 'An unexpected error occurred.');
-    }
+    throw formatApiError(error);
   }
 };
 

@@ -12,6 +12,7 @@ export default function App() {
   const [savedIdeas, setSavedIdeas] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [researchError, setResearchError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
   const scrollToSubmission = () => {
@@ -23,25 +24,37 @@ export default function App() {
   const handleAnalyzeIdea = async (payload) => {
     setIsLoading(true);
     setError(null);
+    setResearchError(null);
     setSuccessMessage(null);
 
     try {
       const data = await extractStartupIdea(payload);
-      setAnalysisResult(data);
-      setSavedIdeas((prev) => [
-        { ...data, id: Date.now(), analyzedAt: new Date().toLocaleTimeString() },
-        ...prev,
-      ]);
-      setSuccessMessage(`Successfully extracted structured insights for "${data.startup_name}".`);
+      const ideaData = data?.idea || data;
+      const normalizedRecord = {
+        ...ideaData,
+        market_research: data?.market_research || null,
+        research_error: data?.research_error || null,
+      };
+
+      setAnalysisResult(normalizedRecord);
+      setResearchError(data?.research_error || null);
+      setIsLoading(false);
+      setSuccessMessage(
+        `Successfully extracted structured insights for "${ideaData.startup_name}".`
+      );
       setActiveTab('my-ideas');
 
       setTimeout(() => {
         const resEl = document.getElementById('results-section');
         if (resEl) resEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 150);
+
+      setSavedIdeas((prev) => [
+        { ...normalizedRecord, id: Date.now(), analyzedAt: new Date().toLocaleTimeString() },
+        ...prev,
+      ]);
     } catch (err) {
       setError(err.message || 'Failed to analyze startup idea.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -74,8 +87,8 @@ export default function App() {
                 Validate & Structure Your Venture
               </h2>
               <p className="mt-3 text-base text-slate-600">
-                Enter your idea on the left and review the AI-extracted startup blueprint on the
-                right.
+                Enter your idea on the left and review the AI-extracted startup blueprint and live
+                market research on the right.
               </p>
             </div>
 
@@ -88,7 +101,9 @@ export default function App() {
                 <AnalysisResults
                   result={analysisResult}
                   isLoading={isLoading}
+                  isResearchLoading={false}
                   error={error}
+                  researchError={researchError}
                   successMessage={successMessage}
                 />
               </div>
@@ -107,6 +122,7 @@ export default function App() {
                       onClick={() => {
                         setAnalysisResult(item);
                         setError(null);
+                        setResearchError(item.research_error || null);
                       }}
                       className={`rounded-xl border px-4 py-2 text-left text-xs transition ${
                         analysisResult?.startup_name === item.startup_name
@@ -131,7 +147,7 @@ export default function App() {
         <p className="font-semibold text-slate-700">
           Team Draco – AI-Powered Startup Validation System
         </p>
-        <p className="mt-1">Milestone 1 • Idea Submission & LLM Structured Extraction</p>
+        <p className="mt-1">Milestone 1 • Idea Submission, LLM Extraction & Live Market Research</p>
       </footer>
     </div>
   );

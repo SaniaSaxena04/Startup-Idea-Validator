@@ -11,8 +11,16 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
+import MarketResearchResults from './MarketResearchResults';
 
-export default function AnalysisResults({ result, isLoading, error, successMessage }) {
+export default function AnalysisResults({
+  result,
+  isLoading,
+  isResearchLoading,
+  error,
+  researchError,
+  successMessage,
+}) {
   return (
     <div id="results-section" className="space-y-6">
       {/* Success Notification */}
@@ -63,7 +71,7 @@ export default function AnalysisResults({ result, isLoading, error, successMessa
           <p className="mt-1.5 max-w-md text-sm text-slate-500">
             Fill out the startup submission form and click{' '}
             <span className="font-semibold text-indigo-600">Analyze My Idea</span> to generate
-            structured AI insights here.
+            structured AI insights and live market research here.
           </p>
         </div>
       )}
@@ -184,6 +192,13 @@ export default function AnalysisResults({ result, isLoading, error, successMessa
               )}
             </div>
           </div>
+
+          {/* Live Tavily Market Research Section */}
+          <MarketResearchResults
+            researchData={result}
+            isResearchLoading={isResearchLoading}
+            researchError={researchError}
+          />
         </div>
       )}
     </div>

@@ -33,3 +33,13 @@ async def health_check():
         "service": "Team Draco – AI-Powered Startup Validation System",
         "version": "1.0.0",
     }
+
+#This is where your FastAPI application starts.
+
+#It:
+#- Creates the FastAPI app.
+#- Configures CORS.
+#- Includes your routers.
+#- Provides the API application that Uvicorn runs.
+
+#you run it using uvicorn app.main:app --reload
